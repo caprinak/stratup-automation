@@ -1,0 +1,105 @@
+# ============================================
+# RELEASE AUTOMATION
+# ============================================
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  release:
+    name: 🚀 Create Release
+    runs-on: windows-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: 📥 Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pyinstaller build
+        shell: pwsh
+      
+      - name: 🎭 Install Playwright
+        run: |
+          pip install playwright
+          playwright install chromium
+        shell: pwsh
+      
+      - name: 📦 Build Python package
+        run: python -m build
+        shell: pwsh
+      
+      - name: 🏗️ Build Windows executable
+        run: |
+          pyinstaller `
+            --onefile `
+            --name startup-automation `
+            --icon assets/icon.ico `
+            --add-data "config.yaml;." `
+            --add-data "templates;templates" `
+            main.py
+        shell: pwsh
+        continue-on-error: true
+      
+      - name: 📝 Generate changelog
+        id: changelog
+        run: |
+          # Simple changelog from commits
+          echo "## What's Changed" > CHANGELOG.md
+          git log --pretty=format:"- %s (%h)" $(git describe --tags --abbrev=0 HEAD^)..HEAD >> CHANGELOG.md
+        shell: bash
+        continue-on-error: true
+      
+      - name: 🏷️ Get version
+        id: version
+        run: |
+          if ("${{ github.event.inputs.version }}" -ne "") {
+            echo "VERSION=${{ github.event.inputs.version }}" >> $env:GITHUB_OUTPUT
+          } else {
+            $tag = "${{ github.ref_name }}" -replace '^v', ''
+            echo "VERSION=$tag" >> $env:GITHUB_OUTPUT
+          }
+        shell: pwsh
+      
+      - name: 📦 Create release archive
+        run: |
+          Compress-Archive -Path dist\*, config.yaml, README.md, scripts\* -DestinationPath "startup-automation-${{ steps.version.outputs.VERSION }}-windows.zip"
+        shell: pwsh
+      
+      - name: 🚀 Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.VERSION }}
+          name: Release v${{ steps.version.outputs.VERSION }}
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.VERSION, 'beta') || contains(steps.version.outputs.VERSION, 'alpha') }}
+          files: |
+            startup-automation-*.zip
+            dist/*.whl
+            dist/*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

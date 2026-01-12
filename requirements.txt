@@ -1,4 +1,7 @@
+# Core dependencies
 playwright>=1.40.0
 pyyaml>=6.0
-win10toast-click>=0.1.2
 psutil>=5.9.0
+
+# Optional integrations
+requests>=2.31.0

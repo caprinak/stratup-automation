@@ -1,0 +1,40 @@
+# ============================================
+# DEPENDABOT CONFIGURATION
+# ============================================
+version: 2
+
+updates:
+  # Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "deps"
+    groups:
+      development:
+        patterns:
+          - "pytest*"
+          - "flake8*"
+          - "black"
+          - "mypy"
+          - "ruff"
+      playwright:
+        patterns:
+          - "playwright*"
+  
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci"
