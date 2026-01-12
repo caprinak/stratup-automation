@@ -1,0 +1,172 @@
+# ==============================================
+# DAILY DASHBOARD CONFIGURATION
+# ==============================================
+
+# User personalization
+user:
+  name: "Alex"
+  avatar: "https://github.com/username.png"
+  timezone: "America/New_York"
+
+# Theme settings
+theme:
+  name: "dark"  # dark, light, nord, dracula, custom
+  accent_color: "#6366f1"
+  background:
+    type: "gradient"  # solid, gradient, image, unsplash
+    value: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)"
+    # For unsplash: "nature,landscape"
+  blur_intensity: 10
+  transparency: 0.05
+
+# Layout configuration
+layout:
+  columns: 3
+  gap: 20
+  widgets:
+    - type: "greeting"
+      position: "header"
+      size: "full"
+      
+    - type: "clock"
+      position: "header"
+      size: "full"
+      show_seconds: true
+      show_date: true
+      
+    - type: "weather"
+      position: "header"
+      size: "auto"
+      
+    - type: "quote"
+      position: "header"
+      size: "full"
+      categories: ["technology", "success", "motivational"]
+      
+    - type: "tasks"
+      position: "main"
+      size: "medium"
+      source: "todoist"  # todoist, notion, local
+      show_completed: false
+      max_items: 5
+      
+    - type: "calendar"
+      position: "main"
+      size: "medium"
+      source: "google"  # google, outlook, local
+      days_ahead: 1
+      max_events: 5
+      
+    - type: "stats"
+      position: "main"
+      size: "small"
+      show_streak: true
+      show_level: true
+      
+    - type: "pomodoro"
+      position: "main"
+      size: "medium"
+      work_minutes: 25
+      break_minutes: 5
+      long_break_minutes: 15
+      
+    - type: "links"
+      position: "main"
+      size: "medium"
+      
+    - type: "news"
+      position: "main"
+      size: "medium"
+      source: "hackernews"  # hackernews, reddit, rss
+      max_items: 5
+      
+    - type: "github"
+      position: "main"
+      size: "small"
+      show_notifications: true
+      show_contributions: true
+      
+    - type: "notes"
+      position: "main"
+      size: "medium"
+      
+    - type: "spotify"
+      position: "footer"
+      size: "full"
+
+# Quick links
+bookmarks:
+  - name: "GitHub"
+    url: "https://github.com"
+    icon: "github"
+    color: "#333"
+    
+  - name: "Gmail"
+    url: "https://mail.google.com"
+    icon: "mail"
+    color: "#EA4335"
+    
+  - name: "Calendar"
+    url: "https://calendar.google.com"
+    icon: "calendar"
+    color: "#4285F4"
+    
+  - name: "Notion"
+    url: "https://notion.so"
+    icon: "book"
+    color: "#000"
+    
+  - name: "ChatGPT"
+    url: "https://chat.openai.com"
+    icon: "message-circle"
+    color: "#10A37F"
+    
+  - name: "YouTube"
+    url: "https://youtube.com"
+    icon: "youtube"
+    color: "#FF0000"
+    
+  - name: "Twitter"
+    url: "https://twitter.com"
+    icon: "twitter"
+    color: "#1DA1F2"
+    
+  - name: "Figma"
+    url: "https://figma.com"
+    icon: "figma"
+    color: "#F24E1E"
+
+# Search configuration
+search:
+  enabled: true
+  engine: "google"  # google, duckduckgo, bing
+  placeholder: "Search the web..."
+  shortcuts:
+    "g": "https://google.com/search?q="
+    "yt": "https://youtube.com/results?search_query="
+    "gh": "https://github.com/search?q="
+    "r": "https://reddit.com/search?q="
+    "w": "https://en.wikipedia.org/wiki/"
+
+# API Keys (use environment variables in production)
+api_keys:
+  weather: "${WEATHER_API_KEY}"
+  todoist: "${TODOIST_API_KEY}"
+  github: "${GITHUB_TOKEN}"
+  google_calendar: "${GOOGLE_CALENDAR_KEY}"
+  spotify: "${SPOTIFY_CLIENT_ID}"
+  notion: "${NOTION_API_KEY}"
+
+# Weather settings
+weather:
+  location: "auto"  # auto, city name, or coordinates
+  units: "metric"   # metric, imperial
+  
+# Update intervals (in minutes)
+refresh:
+  weather: 30
+  tasks: 5
+  calendar: 5
+  news: 15
+  github: 10
+  quotes: 1440  # Once per day
