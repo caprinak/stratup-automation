@@ -1,0 +1,84 @@
+# ===========================================
+# STARTUP AUTOMATION CONFIGURATION
+# ===========================================
+
+general:
+  log_level: "INFO"
+  log_dir: "logs"
+  max_retries: 3
+  retry_delay: 5
+  parallel_browsers: false
+
+network:
+  check_url: "https://www.google.com"
+  timeout_seconds: 10
+
+vpn:
+  enabled: true
+  name: "MyCompanyVPN"
+  type: "windows"  # windows | cisco | nordvpn
+  wait_after_connect: 8
+  verify_ip_change: true
+  
+  # For Cisco AnyConnect (if needed)
+  cisco:
+    path: "C:/Program Files (x86)/Cisco/Cisco AnyConnect Secure Mobility Client/vpncli.exe"
+    host: "vpn.company.com"
+
+folders:
+  - path: "C:/Projects"
+    explorer_view: "details"
+  - path: "C:/Notes"
+    explorer_view: "list"
+  - path: "D:/Work/Documents"
+    explorer_view: "details"
+
+ides:
+  - name: "IntelliJ IDEA"
+    path: "C:/Program Files/JetBrains/IntelliJ IDEA/bin/idea64.exe"
+    project: "C:/Projects/my-project"
+    wait_seconds: 5
+    
+  - name: "VS Code"
+    path: "code"  # If in PATH
+    project: "C:/Projects/frontend"
+    wait_seconds: 3
+
+browsers:
+  work:
+    enabled: true
+    browser_type: "chromium"  # chromium | firefox | webkit
+    profile_dir: "browser_data/work_profile"
+    startup_urls:
+      - url: "https://mail.google.com"
+        wait_for: "networkidle"
+      - url: "https://calendar.google.com"
+        wait_for: "load"
+      - url: "https://jira.company.com"
+        wait_for: "domcontentloaded"
+      - url: "https://github.com/notifications"
+        wait_for: "load"
+    window:
+      width: 1920
+      height: 1080
+      maximized: true
+      
+  personal:
+    enabled: true
+    browser_type: "chromium"
+    profile_dir: "browser_data/personal_profile"
+    startup_urls:
+      - url: "https://news.ycombinator.com"
+        wait_for: "load"
+      - url: "https://youtube.com"
+        wait_for: "domcontentloaded"
+    window:
+      width: 1280
+      height: 800
+      maximized: false
+
+notifications:
+  enabled: true
+  on_success: true
+  on_failure: true
+  sound: true
