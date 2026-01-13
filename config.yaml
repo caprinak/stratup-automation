@@ -59,7 +59,7 @@ apps:
       [
         "--start-maximized",
         "https://claude.ai/",
-        "https://chat.lmsys.org/",
+        "https://lmarena.ai/",
         "https://www.perplexity.ai/",
         "https://chatgpt.com/",
         "https://chat.deepseek.com/",
