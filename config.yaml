@@ -63,6 +63,9 @@ apps:
   - name: "Notepad++"
     path: "C:/Program Files/Notepad++/notepad++.exe"
     wait_seconds: 0
+  - name: "Microsoft Teams"
+    path: "ms-teams.exe"
+    wait_seconds: 2
 
 browsers:
   work:
