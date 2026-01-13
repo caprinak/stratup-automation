@@ -17,7 +17,6 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Win32 (MS Windows)",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
@@ -30,8 +29,9 @@ dependencies = [
     "psutil>=5.9.0",
 ]
 
-[tool.setuptools.packages.find]
-include = ["core*", "phases*", "dashboard*"]
+[tool.setuptools]
+packages = ["core", "phases", "dashboard"]
+py-modules = ["main", "launcher"]
 
 [project.optional-dependencies]
 dev = [
