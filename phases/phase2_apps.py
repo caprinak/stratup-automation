@@ -6,7 +6,14 @@ import time
 from pathlib import Path
 from typing import List
 
-from core.config import Config, FolderConfig, IDEConfig
+import subprocess
+import time
+from pathlib import Path
+from typing import List
+import pyautogui
+import pygetwindow as gw
+
+from core.config import Config, FolderConfig, IDEConfig, GeneralAppConfig
 from core.logger import get_logger
 
 
@@ -29,6 +36,9 @@ class AppsPhase:
             
             # 2. Launch IDEs
             self.launch_ides()
+            
+            # 3. Launch General Apps
+            self.launch_apps()
             
             self.logger.info("Phase 2 completed successfully")
             return True
@@ -108,3 +118,66 @@ class AppsPhase:
             
         except Exception as e:
             self.logger.error(f"Failed to launch {ide.name}: {e}")
+
+    def launch_apps(self):
+        """Launch general applications."""
+        if not self.config.apps:
+            self.logger.info("No general apps configured")
+            return
+        
+        self.logger.info(f"Launching {len(self.config.apps)} general apps...")
+        
+        for app in self.config.apps:
+            self._launch_app(app)
+
+    def _launch_app(self, app: GeneralAppConfig):
+        """Launch a single general application."""
+        try:
+            # Build command string for shell execution to handle spaces properly
+            cmd_str = f'"{app.path}" ' + " ".join(app.args)
+            
+            # Check if path exists (if absolute path)
+            if Path(app.path).is_absolute() and not Path(app.path).exists():
+                self.logger.warning(f"App not found: {app.path}")
+                return
+            
+            # Launch App
+            subprocess.Popen(
+                cmd_str,
+                shell=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS if hasattr(subprocess, 'CREATE_NEW_PROCESS_GROUP') else 0
+            )
+            
+            self.logger.info(f"✓ Launched: {app.name}")
+            
+            # Wait for app to initialize
+            if app.wait_seconds > 0:
+                self.logger.debug(f"Waiting {app.wait_seconds}s for {app.name}...")
+                time.sleep(app.wait_seconds)
+            
+            # SPECIAL HANDLING: Force Chrome session restore
+            # If this is Chrome, send Ctrl+Shift+T to restore tabs
+            if "chrome" in app.name.lower() or "chrome.exe" in app.path.lower():
+                self.logger.info("Sending Ctrl+Shift+T to restore Chrome session...")
+                time.sleep(2) # Extra wait to ensure window is ready
+                
+                # Ensure Chrome window is focused
+                chrome_windows = [w for w in gw.getWindowsWithTitle('Chrome') if w.title]
+                if chrome_windows:
+                    try:
+                        w = chrome_windows[0]
+                        if w.isMinimized:
+                            w.restore()
+                        w.activate()
+                        time.sleep(0.5)
+                    except:
+                        pass
+                
+                # Send the shortcut
+                pyautogui.hotkey('ctrl', 'shift', 't')
+                self.logger.info("✓ Session restore shortcut sent")
+
+        except Exception as e:
+            self.logger.error(f"Failed to launch {app.name}: {e}")

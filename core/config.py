@@ -5,6 +5,8 @@ from dataclasses import dataclass, field
 from typing import Optional, List, Dict
 from pathlib import Path
 import yaml
+import os
+from dotenv import load_dotenv
 
 
 @dataclass
@@ -14,8 +16,14 @@ class VPNConfig:
     type: str = "windows"
     wait_after_connect: int = 8
     verify_ip_change: bool = True
+    password: Optional[str] = None
     cisco_path: Optional[str] = None
     cisco_host: Optional[str] = None
+
+
+@dataclass
+class FortiClientConfig:
+    path: str = "C:/Program Files/Fortinet/FortiClient/FortiClient.exe"
 
 
 @dataclass
@@ -55,6 +63,14 @@ class IDEConfig:
 
 
 @dataclass
+class GeneralAppConfig:
+    name: str
+    path: str
+    args: List[str] = field(default_factory=list)
+    wait_seconds: int = 2
+
+
+@dataclass
 class Config:
     log_level: str = "INFO"
     log_dir: str = "logs"
@@ -66,12 +82,17 @@ class Config:
     vpn: VPNConfig = field(default_factory=VPNConfig)
     folders: List[FolderConfig] = field(default_factory=list)
     ides: List[IDEConfig] = field(default_factory=list)
+    apps: List[GeneralAppConfig] = field(default_factory=list)
     browsers: Dict[str, BrowserConfig] = field(default_factory=dict)
+    forticlient: FortiClientConfig = field(default_factory=FortiClientConfig)
     notifications_enabled: bool = True
 
 
 def load_config(config_path: str = "config.yaml") -> Config:
-    """Load and parse configuration from YAML file."""
+    """Load and parse configuration from YAML file and environment variables."""
+    # Load .env file
+    load_dotenv()
+    
     path = Path(config_path)
     
     if not path.exists():
@@ -98,14 +119,24 @@ def load_config(config_path: str = "config.yaml") -> Config:
     
     # VPN
     vpn_raw = raw.get('vpn', {})
+    # Priority: Environment variable > Config file
+    password = os.environ.get('VPN_PASSWORD') or vpn_raw.get('password')
+    
     config.vpn = VPNConfig(
         enabled=vpn_raw.get('enabled', True),
         name=vpn_raw.get('name', ''),
         type=vpn_raw.get('type', 'windows'),
         wait_after_connect=vpn_raw.get('wait_after_connect', 8),
         verify_ip_change=vpn_raw.get('verify_ip_change', True),
+        password=password,
         cisco_path=vpn_raw.get('cisco', {}).get('path'),
         cisco_host=vpn_raw.get('cisco', {}).get('host'),
+    )
+
+    # FortiClient
+    forti_raw = raw.get('forticlient', {})
+    config.forticlient = FortiClientConfig(
+        path=forti_raw.get('path', "C:/Program Files/Fortinet/FortiClient/FortiClient.exe")
     )
     
     # Folders
@@ -122,6 +153,15 @@ def load_config(config_path: str = "config.yaml") -> Config:
             path=ide.get('path', ''),
             project=ide.get('project'),
             wait_seconds=ide.get('wait_seconds', 5)
+        ))
+    
+    # General Apps
+    for app in raw.get('apps', []):
+        config.apps.append(GeneralAppConfig(
+            name=app.get('name', ''),
+            path=app.get('path', ''),
+            args=app.get('args', []),
+            wait_seconds=app.get('wait_seconds', 2)
         ))
     
     # Browsers

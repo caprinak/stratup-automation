@@ -15,22 +15,26 @@ network:
 
 vpn:
   enabled: true
-  name: "MyCompanyVPN"
-  type: "windows"  # windows | cisco | nordvpn
-  wait_after_connect: 8
+  name: "WorkVPN" # Replace with your FortiClient connection name
+  type: "forticlient" # windows | cisco | nordvpn | forticlient
+  # password: "Stored in .env"
+  wait_after_connect: 5
   verify_ip_change: true
-  
-  # For Cisco AnyConnect (if needed)
-  cisco:
-    path: "C:/Program Files (x86)/Cisco/Cisco AnyConnect Secure Mobility Client/vpncli.exe"
-    host: "vpn.company.com"
+
+# For Cisco AnyConnect (if needed)
+# cisco:
+#   path: "C:/Program Files (x86)/Cisco/Cisco AnyConnect Secure Mobility Client/vpncli.exe"
+#   host: "vpn.company.com"
+
+forticlient:
+  path: "C:/Program Files/Fortinet/FortiClient/FortiClient.exe"
 
 folders:
-  - path: "C:/Projects"
+  - path: "D:/"
     explorer_view: "details"
-  - path: "C:/Notes"
-    explorer_view: "list"
-  - path: "D:/Work/Documents"
+  - path: "D:/World of Wizard/AI SPONSOR"
+    explorer_view: "details"
+  - path: "C:/Projects"
     explorer_view: "details"
 
 ides:
@@ -38,16 +42,32 @@ ides:
     path: "C:/Program Files/JetBrains/IntelliJ IDEA/bin/idea64.exe"
     project: "C:/Projects/my-project"
     wait_seconds: 5
-    
-  - name: "VS Code"
-    path: "code"  # If in PATH
-    project: "C:/Projects/frontend"
-    wait_seconds: 3
+
+#  - name: "VS Code"
+#    path: "code" # If in PATH
+#    project: "C:/Projects/frontend"
+#    wait_seconds: 3
+
+apps:
+  - name: "Google Chrome"
+    path: "C:/Program Files/Google/Chrome/Application/chrome.exe"
+    args: ["--restore-last-session", "--start-maximized"]
+    wait_seconds: 1
+  - name: "Microsoft Edge"
+    path: "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
+    args: ["--start-maximized"]
+    wait_seconds: 1
+  - name: "Antigravity"
+    path: "D:/SOFTWARE/Antigravity/Antigravity.exe"
+    wait_seconds: 1
+  - name: "Notepad++"
+    path: "C:/Program Files/Notepad++/notepad++.exe"
+    wait_seconds: 0
 
 browsers:
   work:
-    enabled: true
-    browser_type: "chromium"  # chromium | firefox | webkit
+    enabled: false
+    browser_type: "chromium" # chromium | firefox | webkit
     profile_dir: "browser_data/work_profile"
     startup_urls:
       - url: "https://mail.google.com"
@@ -62,9 +82,9 @@ browsers:
       width: 1920
       height: 1080
       maximized: true
-      
+
   personal:
-    enabled: true
+    enabled: false
     browser_type: "chromium"
     profile_dir: "browser_data/personal_profile"
     startup_urls:

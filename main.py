@@ -111,15 +111,6 @@ def main():
     errors = []
     
     try:
-        # Phase 1: System tasks
-        if not args.browsers_only:
-            try:
-                phase1 = SystemPhase(config)
-                results["phase1"] = phase1.run()
-            except Exception as e:
-                errors.append(f"Phase 1: {e}")
-                logger.error(f"Phase 1 error: {e}")
-        
         # Phase 2: Applications
         if not args.browsers_only:
             try:
@@ -137,6 +128,15 @@ def main():
             except Exception as e:
                 errors.append(f"Phase 3: {e}")
                 logger.error(f"Phase 3 error: {e}")
+
+        # Phase 1: System tasks (VPN) - Moved to last stage
+        if not args.browsers_only and not args.skip_vpn:
+            try:
+                phase1 = SystemPhase(config)
+                results["phase1"] = phase1.run()
+            except Exception as e:
+                errors.append(f"Phase 1: {e}")
+                logger.error(f"Phase 1 error: {e}")
         
         # Summary
         elapsed = (datetime.now() - start_time).total_seconds()
@@ -181,6 +181,8 @@ def _show_plan(config: Config, args):
             logger.info(f"  • Open folder: {folder.path}")
         for ide in config.ides:
             logger.info(f"  • Launch IDE: {ide.name}")
+        for app in config.apps:
+            logger.info(f"  • Launch App: {app.name}")
     
     if not args.skip_browsers:
         logger.info("\nPhase 3 - Browsers:")
