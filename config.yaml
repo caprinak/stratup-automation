@@ -39,8 +39,8 @@ folders:
 
 ides:
   - name: "IntelliJ IDEA"
-    path: "C:/Program Files/JetBrains/IntelliJ IDEA/bin/idea64.exe"
-    project: "C:/Projects/my-project"
+    path: "C:/Users/nkhoa3/AppData/Local/Programs/IntelliJ IDEA 2025.2/bin/idea64.exe"
+    project: "D:/World of Wizard/AI SPONSOR"
     wait_seconds: 5
 
 #  - name: "VS Code"
