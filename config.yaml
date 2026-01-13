@@ -55,7 +55,15 @@ apps:
     wait_seconds: 1
   - name: "Microsoft Edge"
     path: "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
-    args: ["--start-maximized"]
+    args:
+      [
+        "--start-maximized",
+        "https://claude.ai/",
+        "https://chat.lmsys.org/",
+        "https://www.perplexity.ai/",
+        "https://chatgpt.com/",
+        "https://chat.deepseek.com/",
+      ]
     wait_seconds: 1
   - name: "Antigravity"
     path: "D:/SOFTWARE/Antigravity/Antigravity.exe"
