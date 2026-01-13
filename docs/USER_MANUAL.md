@@ -52,6 +52,10 @@ vpn:
   verify_ip_change: true # Checks if public IP changes after connect
 ```
 
+> [!IMPORTANT] > **Security**: Do not store passwords in `config.yaml`.
+> Create a **`.env`** file in the root directory and add:
+> `VPN_PASSWORD=your_password_here`
+
 ### Applications (IDEs & Folders)
 
 Define which tools and folders to open.
@@ -123,15 +127,13 @@ To have this run automatically when you log in:
 
 ---
 
-## Browsers & Profiles
+## Browsers & Persistence
 
-This tool uses **Playwright Persistent Contexts**. This means:
+The tool is optimized for **daily use**:
 
-- **Cookies are saved**: You won't have to log in to Gmail/Jira every day.
-- **Extensions**: You can manually install extensions in the launched browser, and they _should_ persist if they store data in the user directory (though Playwright has some limitations with extensions in automation mode).
-- **Keep-Alive**: When the script runs, it launches the browsers and then **stays running**.
-  - If you close the command window running the script, the browsers **will close**.
-  - **Recommendation**: Let the script run in the background (Window is hidden if run via Task Scheduler properly, or just minimized).
+- **Cookies are saved**: Sessions for Gmail, Jira, and Slack are preserved.
+- **Standalone Windows**: Browsers are launched using a specialized `subprocess` method that ensures the windows **stay open** even after the startup automation finishes.
+- **Chrome History**: Launched with `--restore-last-session` to recover all your previous tabs automatically.
 
 ---
 
