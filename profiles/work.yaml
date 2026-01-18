@@ -1,0 +1,41 @@
+# Work Profile
+# This profile overrides base config.yaml for work environment
+
+general:
+  log_level: "INFO"
+
+vpn:
+  enabled: true
+
+folders:
+  - path: "D:/HFMT/WIP/SETUP"
+    explorer_view: "details"
+  - path: "C:/Projects"
+    explorer_view: "details"
+
+ides:
+  - name: "IntelliJ IDEA"
+    path: "C:/Users/nkhoa3/AppData/Local/Programs/IntelliJ IDEA 2025.2/bin/idea64.exe"
+    project: "D:/HFMT/WIP/SETUP"
+    wait_seconds: 5
+
+apps:
+  - name: "Microsoft Teams"
+    path: "ms-teams.exe"
+    wait_seconds: 2
+
+# Work-specific browser setup
+browsers:
+  work:
+    enabled: true
+    browser_type: "chromium"
+    profile_dir: "browser_data/work_profile"
+    startup_urls:
+      - url: "https://mail.google.com"
+        wait_for: "networkidle"
+      - url: "https://calendar.google.com"
+        wait_for: "load"
+    window:
+      width: 1920
+      height: 1080
+      maximized: true

@@ -1,0 +1,35 @@
+# Home Profile
+# This profile overrides base config.yaml for home environment
+
+general:
+  log_level: "INFO"
+
+vpn:
+  enabled: false
+
+folders:
+  - path: "D:/"
+    explorer_view: "details"
+
+# Minimal apps for home
+apps:
+  - name: "Google Chrome"
+    path: "C:/Program Files/Google/Chrome/Application/chrome.exe"
+    args: ["--restore-last-session", "--start-maximized"]
+    wait_seconds: 1
+
+# Personal browser setup
+browsers:
+  personal:
+    enabled: true
+    browser_type: "chromium"
+    profile_dir: "browser_data/personal_profile"
+    startup_urls:
+      - url: "https://news.ycombinator.com"
+        wait_for: "load"
+      - url: "https://youtube.com"
+        wait_for: "domcontentloaded"
+    window:
+      width: 1280
+      height: 800
+      maximized: false

@@ -44,6 +44,12 @@ def parse_args():
     )
     
     parser.add_argument(
+        "--profile", "-p",
+        default=None,
+        help="Profile name to load (e.g., work, home, travel)"
+    )
+    
+    parser.add_argument(
         "--skip-vpn",
         action="store_true",
         help="Skip VPN connection"
@@ -77,9 +83,12 @@ def main():
     
     # Load configuration
     try:
-        config = load_config(args.config)
+        config = load_config(args.config, profile=args.profile)
     except FileNotFoundError as e:
         print(f"ERROR: {e}")
+        sys.exit(1)
+    except ValueError as e:
+        print(f"CONFIG ERROR: {e}")
         sys.exit(1)
     
     # Apply CLI overrides
