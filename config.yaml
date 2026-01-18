@@ -32,7 +32,7 @@ forticlient:
 folders:
   - path: "D:/"
     explorer_view: "details"
-  - path: "D:/World of Wizard/AI SPONSOR"
+  - path: "D:/HFMT/WIP/SETUP"
     explorer_view: "details"
   - path: "C:/Projects"
     explorer_view: "details"
@@ -40,7 +40,7 @@ folders:
 ides:
   - name: "IntelliJ IDEA"
     path: "C:/Users/nkhoa3/AppData/Local/Programs/IntelliJ IDEA 2025.2/bin/idea64.exe"
-    project: "D:/World of Wizard/AI SPONSOR"
+    project: "D:/HFMT/WIP/SETUP"
     wait_seconds: 5
 
 #  - name: "VS Code"

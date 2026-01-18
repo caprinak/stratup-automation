@@ -1,8 +1,9 @@
 # create_scheduled_task.ps1
+$projectPath = "D:\World of Wizard\AI SPONSOR\stratup-automation"
 $Action = New-ScheduledTaskAction `
-    -Execute "C:\path\to\startup-automation\venv\Scripts\python.exe" `
+    -Execute "$projectPath\venv\Scripts\python.exe" `
     -Argument "main.py" `
-    -WorkingDirectory "C:\path\to\startup-automation"
+    -WorkingDirectory "$projectPath"
 
 $Trigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
 
