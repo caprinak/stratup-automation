@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 import yaml
 import os
 from dotenv import load_dotenv
+from core.vault import get_vpn_password
 
 
 class VPNConfig(BaseModel):
@@ -265,7 +266,9 @@ def _parse_config(raw: dict) -> Config:
     
     # VPN
     vpn_raw = raw.get('vpn', {})
-    password = os.environ.get('VPN_PASSWORD') or vpn_raw.get('password')
+    # Priority: Vault > Environment variable > Config file
+    vault_password = get_vpn_password()
+    password = vault_password or os.environ.get('VPN_PASSWORD') or vpn_raw.get('password')
     config_dict["vpn"] = {
         "enabled": vpn_raw.get('enabled', True),
         "name": vpn_raw.get('name', ''),

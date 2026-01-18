@@ -29,6 +29,7 @@ from core.notifier import Notifier
 from phases.phase1_system import SystemPhase
 from phases.phase2_apps import AppsPhase
 from phases.phase3_browsers import BrowserPhase
+from core.metrics import MetricsTracker, format_ascii_chart
 
 
 def parse_args():
@@ -73,6 +74,32 @@ def parse_args():
         help="Show what would be done without executing"
     )
     
+    parser.add_argument(
+        "--set-password",
+        nargs="?",
+        const=True,
+        metavar="PASSWORD",
+        help="Store VPN password in Windows Credential Manager. If no password is provided, prompts for input."
+    )
+    
+    parser.add_argument(
+        "--delete-password",
+        action="store_true",
+        help="Delete VPN password from Windows Credential Manager"
+    )
+    
+    parser.add_argument(
+        "--list-passwords",
+        action="store_true",
+        help="List all stored passwords in vault"
+    )
+    
+    parser.add_argument(
+        "--metrics",
+        action="store_true",
+        help="View startup metrics history"
+    )
+    
     return parser.parse_args()
 
 
@@ -80,6 +107,50 @@ def main():
     """Main orchestration function."""
     args = parse_args()
     start_time = datetime.now()
+    
+    # Handle password management commands
+    if args.list_passwords:
+        from core.vault import VaultManager
+        services = VaultManager.list_credentials()
+        if services:
+            print("Stored credentials:")
+            for service in services:
+                print(f"  - {service}")
+        else:
+            print("No credentials stored.")
+        return
+    
+    if args.delete_password:
+        from core.vault import delete_vpn_password
+        if delete_vpn_password():
+            print("✓ VPN password deleted from vault")
+        else:
+            print("✗ Failed to delete VPN password")
+        return
+    
+    if args.set_password is not None:
+        from core.vault import set_vpn_password, delete_vpn_password
+        import getpass
+        
+        # Get password
+        if args.set_password is True:
+            password = getpass.getpass("Enter VPN password (hidden): ")
+            confirm = getpass.getpass("Confirm password: ")
+            if password != confirm:
+                print("✗ Passwords do not match")
+                sys.exit(1)
+        else:
+            password = args.set_password
+        
+        # Delete existing first
+        delete_vpn_password()
+        
+        # Store new password
+        if set_vpn_password(password):
+            print("✓ VPN password stored in Windows Credential Manager")
+        else:
+            print("✗ Failed to store VPN password")
+        return
     
     # Load configuration
     try:
@@ -90,6 +161,18 @@ def main():
     except ValueError as e:
         print(f"CONFIG ERROR: {e}")
         sys.exit(1)
+    
+    # Initialize metrics tracking
+    metrics_tracker = MetricsTracker(config.log_dir)
+    metrics = metrics_tracker.start(profile=args.profile)
+    
+    # Handle metrics view command
+    if args.metrics:
+        print(metrics_tracker.format_history())
+        print()
+        print(metrics_tracker.format_summary())
+        print(format_ascii_chart(metrics_tracker.get_history(limit=20)))
+        return
     
     # Apply CLI overrides
     if args.skip_vpn:
@@ -122,30 +205,45 @@ def main():
     try:
         # Phase 2: Applications
         if not args.browsers_only:
+            phase2_start = datetime.now()
             try:
                 phase2 = AppsPhase(config)
                 results["phase2"] = phase2.run()
+                phase2_duration = (datetime.now() - phase2_start).total_seconds()
+                metrics.record_phase("phase2", phase2_duration, results["phase2"])
             except Exception as e:
                 errors.append(f"Phase 2: {e}")
                 logger.error(f"Phase 2 error: {e}")
+                metrics.record_phase("phase2", 0, False)
+                metrics.add_error(f"Phase 2: {e}")
         
         # Phase 3: Browsers
         if not args.skip_browsers:
+            phase3_start = datetime.now()
             try:
                 phase3 = BrowserPhase(config)
                 results["phase3"] = phase3.run()
+                phase3_duration = (datetime.now() - phase3_start).total_seconds()
+                metrics.record_phase("phase3", phase3_duration, results["phase3"])
             except Exception as e:
                 errors.append(f"Phase 3: {e}")
                 logger.error(f"Phase 3 error: {e}")
+                metrics.record_phase("phase3", 0, False)
+                metrics.add_error(f"Phase 3: {e}")
 
         # Phase 1: System tasks (VPN) - Moved to last stage
         if not args.browsers_only and not args.skip_vpn:
+            phase1_start = datetime.now()
             try:
                 phase1 = SystemPhase(config)
                 results["phase1"] = phase1.run()
+                phase1_duration = (datetime.now() - phase1_start).total_seconds()
+                metrics.record_phase("phase1", phase1_duration, results["phase1"])
             except Exception as e:
                 errors.append(f"Phase 1: {e}")
                 logger.error(f"Phase 1 error: {e}")
+                metrics.record_phase("phase1", 0, False)
+                metrics.add_error(f"Phase 1: {e}")
         
         # Summary
         elapsed = (datetime.now() - start_time).total_seconds()
@@ -159,6 +257,11 @@ def main():
             notifier.warning(f"Completed with {len(errors)} error(s)")
         else:
             notifier.success(f"All systems ready in {elapsed:.0f}s")
+        
+        # Save metrics
+        if not args.dry_run:
+            metrics.save(config.log_dir)
+            logger.info("✓ Metrics recorded")
     
     except KeyboardInterrupt:
         logger.warning("Startup interrupted by user")

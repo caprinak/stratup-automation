@@ -17,6 +17,7 @@ import pygetwindow as gw
 
 from core.config import Config, FolderConfig, IDEConfig, GeneralAppConfig
 from core.logger import get_logger
+from core.conditions import should_launch_app
 
 
 class AppsPhase:
@@ -128,19 +129,32 @@ class AppsPhase:
             self.logger.info("No general apps configured")
             return
         
+        # Filter enabled apps
         enabled_apps = [app for app in self.config.apps if app.enabled]
         if not enabled_apps:
             self.logger.info("No enabled general apps")
             return
         
-        self.logger.info(f"Launching {len(enabled_apps)} general apps (with dependencies)...")
+        # Filter by conditions
+        apps_to_launch = []
+        for app in enabled_apps:
+            if should_launch_app(app.conditions):
+                apps_to_launch.append(app)
+            else:
+                self.logger.info(f"⏭️  Skipping {app.name} (conditions not met)")
+        
+        if not apps_to_launch:
+            self.logger.info("No apps matching current conditions")
+            return
+        
+        self.logger.info(f"Launching {len(apps_to_launch)} general apps (with dependencies and conditions)...")
         
         # Get launch order with topological sort
-        launch_order = self._get_launch_order(enabled_apps)
+        launch_order = self._get_launch_order(apps_to_launch)
         
         # Launch apps in order
         for app_name in launch_order:
-            app = next((a for a in enabled_apps if a.name == app_name), None)
+            app = next((a for a in apps_to_launch if a.name == app_name), None)
             if app:
                 self._launch_app(app)
     
