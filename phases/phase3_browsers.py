@@ -109,7 +109,7 @@ class BrowserPhase:
             
             # IMPORTANT: Don't close context!
             # Detach from it so browser stays open
-            self.logger.info(f"✓ Browser {name} launched with {len(browser_config.startup_urls)} tabs")
+            self.logger.info(f"[OK] Browser {name} launched with {len(browser_config.startup_urls)} tabs")
             
             # Small delay before detaching
             time.sleep(2)
@@ -140,7 +140,7 @@ class BrowserPhase:
                     timeout=30000
                 )
                 
-                self.logger.info(f"  ✓ {url_config.url}")
+                self.logger.info(f"  [OK] {url_config.url}")
                 
             except Exception as e:
                 self.logger.warning(f"  ✗ Failed to load {url_config.url}: {e}")

@@ -3,6 +3,7 @@
 
 general:
   log_level: "INFO"
+  parallel_browsers: true
 
 vpn:
   enabled: true

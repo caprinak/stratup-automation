@@ -75,7 +75,7 @@ class AppsPhase:
                 ["explorer", str(path)],
                 shell=True
             )
-            self.logger.info(f"✓ Opened: {folder.path}")
+            self.logger.info(f"[OK] Opened: {folder.path}")
             time.sleep(0.5)  # Brief delay between windows
             
         except Exception as e:
@@ -113,7 +113,7 @@ class AppsPhase:
                 stderr=subprocess.DEVNULL
             )
             
-            self.logger.info(f"✓ Launched: {ide.name}")
+            self.logger.info(f"[OK] Launched: {ide.name}")
             
             # Wait for IDE to initialize
             if ide.wait_seconds > 0:
@@ -141,7 +141,7 @@ class AppsPhase:
             if should_launch_app(app.conditions):
                 apps_to_launch.append(app)
             else:
-                self.logger.info(f"⏭️  Skipping {app.name} (conditions not met)")
+                self.logger.info(f"[SKIP] {app.name} (conditions not met)")
         
         if not apps_to_launch:
             self.logger.info("No apps matching current conditions")
@@ -234,7 +234,7 @@ class AppsPhase:
                 )
                 
                 attempt_msg = f" (attempt {attempt + 1}/{max_attempts})" if max_attempts > 1 else ""
-                self.logger.info(f"✓ Launched: {app.name}{attempt_msg}")
+                self.logger.info(f"[OK] Launched: {app.name}{attempt_msg}")
                 
                 # Wait for app to initialize
                 wait_time = app.wait_seconds + (app.health_check.timeout if app.health_check.method != "none" else 0)
@@ -303,10 +303,10 @@ class AppsPhase:
                 windows = [w for w in all_windows if w.title and pattern_re.search(w.title)]
             
             if windows:
-                self.logger.debug(f"✓ Found window matching '{pattern}': {windows[0].title}")
+                self.logger.debug(f"[OK] Found window matching '{pattern}': {windows[0].title}")
                 return True
             else:
-                self.logger.warning(f"✗ No window found matching '{pattern}'")
+                self.logger.warning(f"[FAIL] No window found matching '{pattern}'")
                 return False
         except Exception as e:
             self.logger.warning(f"Window title health check failed: {e}")
@@ -323,10 +323,10 @@ class AppsPhase:
             sock.close()
             
             if result == 0:
-                self.logger.debug(f"✓ Port {port} is open")
+                self.logger.debug(f"[OK] Port {port} is open")
                 return True
             else:
-                self.logger.warning(f"✗ Port {port} is not open")
+                self.logger.warning(f"[FAIL] Port {port} is not open")
                 return False
         except Exception as e:
             self.logger.warning(f"Port health check failed: {e}")
@@ -338,9 +338,9 @@ class AppsPhase:
             import psutil
             for proc in psutil.process_iter(['name']):
                 if process_name.lower() in proc.info['name'].lower():
-                    self.logger.debug(f"✓ Found process: {proc.info['name']}")
+                    self.logger.debug(f"[OK] Found process: {proc.info['name']}")
                     return True
-            self.logger.warning(f"✗ Process '{process_name}' not found")
+            self.logger.warning(f"[FAIL] Process '{process_name}' not found")
             return False
         except Exception as e:
             self.logger.warning(f"Process health check failed: {e}")
@@ -364,6 +364,6 @@ class AppsPhase:
                     pass
             
             pyautogui.hotkey('ctrl', 'shift', 't')
-            self.logger.info("✓ Session restore shortcut sent")
+            self.logger.info("[OK] Session restore shortcut sent")
         except Exception as e:
             self.logger.warning(f"Failed to restore Chrome session: {e}")

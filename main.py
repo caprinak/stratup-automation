@@ -123,9 +123,9 @@ def main():
     if args.delete_password:
         from core.vault import delete_vpn_password
         if delete_vpn_password():
-            print("✓ VPN password deleted from vault")
+            print("VPN password deleted from vault")
         else:
-            print("✗ Failed to delete VPN password")
+            print("Failed to delete VPN password")
         return
     
     if args.set_password is not None:
@@ -137,8 +137,7 @@ def main():
             password = getpass.getpass("Enter VPN password (hidden): ")
             confirm = getpass.getpass("Confirm password: ")
             if password != confirm:
-                print("✗ Passwords do not match")
-                sys.exit(1)
+                print("Passwords do not match")
         else:
             password = args.set_password
         
@@ -147,9 +146,9 @@ def main():
         
         # Store new password
         if set_vpn_password(password):
-            print("✓ VPN password stored in Windows Credential Manager")
+            print("VPN password stored in Windows Credential Manager")
         else:
-            print("✗ Failed to store VPN password")
+            print("Failed to store VPN password")
         return
     
     # Load configuration

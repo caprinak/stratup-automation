@@ -2,10 +2,11 @@
 Logging configuration with rotating file handler
 """
 import logging
+import sys
+import os
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from datetime import datetime
-import sys
 
 
 def setup_logger(
@@ -19,9 +20,34 @@ def setup_logger(
     Returns:
         Configured logger instance
     """
+    # Set UTF-8 encoding for console output
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+
+
+def setup_logger(
+    name: str = "startup",
+    log_dir: str = "logs",
+    level: str = "INFO"
+) -> logging.Logger:
+    """
+    Set up a logger with both console and file output.
+    
+    Returns:
+        Configured logger instance
+    """
+    # Set UTF-8 encoding for console output
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+    
     # Create logs directory
     log_path = Path(log_dir)
     log_path.mkdir(exist_ok=True)
+    
+    # Set UTF-8 encoding for console output
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
+    
+    # Also configure stdout
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')
     
     # Create logger
     logger = logging.getLogger(name)

@@ -60,7 +60,7 @@ class SystemPhase:
                 self.config.network_check_url,
                 timeout=self.config.network_timeout
             )
-            self.logger.info("✓ Network is available")
+            self.logger.info("[OK] Network is available")
             return True
         except Exception as e:
             raise ConnectionError(f"Network check failed: {e}")
@@ -88,7 +88,7 @@ class SystemPhase:
         
         # Check if already connected
         if self._is_vpn_connected(vpn):
-            self.logger.info("✓ VPN already connected")
+            self.logger.info("[OK] VPN already connected")
             return True
         
         # Connect based on VPN type
@@ -121,11 +121,11 @@ class SystemPhase:
         if vpn.verify_ip_change and ip_before:
             ip_after = self.get_current_ip()
             if ip_after and ip_after != ip_before:
-                self.logger.info(f"✓ IP changed: {ip_before} → {ip_after}")
+                self.logger.info(f"[OK] IP changed: {ip_before} -> {ip_after}")
             else:
                 self.logger.warning("IP did not change after VPN connection")
         
-        self.logger.info("✓ VPN connected successfully")
+        self.logger.info("[OK] VPN connected successfully")
         return True
     
     def _is_vpn_connected(self, vpn: VPNConfig) -> bool:
@@ -141,7 +141,7 @@ class SystemPhase:
                     # Look for adapters with 'Forti', 'SSLVPN', 'Fortinet'
                     is_match = any(x in name.lower() for x in ["forti", "sslvpn", "fortinet"])
                     if is_match and stats.isup:
-                        self.logger.info(f"✓ Found active FortiClient adapter: '{name}'")
+                        self.logger.info(f"[OK] Found active FortiClient adapter: '{name}'")
                         return True
                     # Fallback for some windows versions where it might be "Local Area Connection X"
                     # but the hardware address or something else identifies it.
@@ -257,7 +257,7 @@ class SystemPhase:
                         time.sleep(0.5)
                         
                         pyautogui.press('enter')
-                        self.logger.info("✓ Login sequence completed")
+                        self.logger.info("[OK] Login sequence completed")
                     finally:
                         pyautogui.PAUSE = old_pause
                         pyperclip.copy('') # Clear for security
